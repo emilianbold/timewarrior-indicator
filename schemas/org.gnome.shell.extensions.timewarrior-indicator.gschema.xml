@@ -22,5 +22,10 @@
       <description>Location of the timew executable.</description>
     </key>
 
+    <key type="s" name="default-tag-text">
+      <default>"Work"</default>
+      <summary>Text displayed when no explicit tag set.</summary>
+      <description>Text displayed when no explicit tag set.</description>
+    </key>
   </schema>
 </schemalist>

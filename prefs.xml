@@ -97,7 +97,23 @@
 							</child>
 						</object>
 					</child>
-
+					<child>
+						<object class="GtkBox">
+							<property name="margin-left">12</property>
+							<property name="spacing">12</property>
+							<child>
+								<object class="GtkLabel">
+									<property name="label" translatable="yes">Text for no tag</property>
+									<property name="hexpand">true</property>
+									<property name="halign">1</property>
+								</object>
+							</child>
+							<child>
+								<object class="GtkEntry" id="default-tag-text">
+								</object>
+							</child>
+						</object>
+					</child>
 				</object>
 			</child>
 

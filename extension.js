@@ -179,7 +179,7 @@ const TimeWarriorIndicator = new Lang.Class({
 		INTERVAL = this._settings.get_int('interval');
 		TIMEW = this._settings.get_string('timew-cmd');
 		TAG_LIMIT = this._settings.get_int('tag-length');
-		TAG_DEFAULT = "Work"; //this._settings.get_string('default-tag-text');
+		TAG_DEFAULT = this._settings.get_string('default-tag-text');
 		TIMEWACT = TIMEW.concat(' get dom.active');
 		TIMEWJSON = TIMEWACT.concat('.json');
 	},

@@ -43,6 +43,7 @@ function buildPrefsWidget(){
 	settings.bind('interval' , buildable.get_object('update-interval') , 'value' , Gio.SettingsBindFlags.DEFAULT);
 	settings.bind('tag-length' , buildable.get_object('tag-length') , 'value' , Gio.SettingsBindFlags.DEFAULT);
 	settings.bind('timew-cmd' , buildable.get_object('timew-cmd') , 'text' , Gio.SettingsBindFlags.DEFAULT);
+	settings.bind('default-tag-text' , buildable.get_object('default-tag-text') , 'text' , Gio.SettingsBindFlags.DEFAULT);
 
 	box.show_all();
 	return box;
