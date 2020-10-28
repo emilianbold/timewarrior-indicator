@@ -62,12 +62,12 @@ const TimeWarriorIndicator = new Lang.Class({
     this._refresh();
 
 		// Adding menu items
-		this.stopMenuItem = new PopupMenu.PopupMenuItem(_('Stop tracking'));
-		this.restartMenuItem = new PopupMenu.PopupMenuItem(_('Restart tracking'));
+		this.stopMenuItem = new PopupMenu.PopupMenuItem(_('⏹️ Stop tracking'));
+		this.restartMenuItem = new PopupMenu.PopupMenuItem(_('▶️ Restart tracking'));
 		let settingsMenuItem = new PopupMenu.PopupMenuItem(_('Settings'));
 
-		this.menu.addMenuItem(this.stopMenuItem);
 		this.menu.addMenuItem(this.restartMenuItem);
+		this.menu.addMenuItem(this.stopMenuItem);
 		this.menu.addMenuItem(settingsMenuItem);
 
 		// Bind menu items to actions
