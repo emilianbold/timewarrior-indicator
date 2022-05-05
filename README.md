@@ -19,22 +19,11 @@ either for the convenience of using git or to test the latest version.
 
 Clone the latest version with git
 
-    git clone https://github.com/tassos/timewarrior-indicator.git \
+    git clone https://github.com/emilianbold/timewarrior-indicator.git \
     ~/.local/share/gnome-shell/extensions/timewarrior-indicator@natsakis.com
 
 A Shell reload is required <code>Alt+F2 r Enter</code> and extension
-has to be enabled with *gnome-tweak-tool*
-
-## Upcoming features
-
-Some ideas for extra features:
-
-- ~~Create a settings panel~~ (implemented in 38625363c7c357a69418896f5ff35377abe62ef6)
-- ~~Restart previous activities from the panel~~ (implemented in 38625363c7c357a69418896f5ff35377abe62ef6)
-- Change the display format
-- Change the tag to display
-
-If you have any ideas on how to make this tool more useful, please contact me!
+has to be enabled with *gnome-extensions-app* and/or *gnome-tweak-tool*
 
 ## Author
 
