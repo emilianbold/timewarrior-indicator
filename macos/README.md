@@ -4,36 +4,20 @@ A native macOS menu bar application that displays your current [timewarrior](htt
 
 <!-- TODO: Add screenshot here -->
 
-## Requirements
+**Requirements:** macOS 12 (Monterey) or later, [Timewarrior](https://timewarrior.net/) installed
 
-- macOS 12 (Monterey) or later
-- [Timewarrior](https://timewarrior.net/) installed
+**Download:** [Releases page](https://github.com/emilianbold/timewarrior-indicator/releases)
 
-## Installation
-
-### Download
-
-Download the latest release from the [Releases page](https://github.com/emilianbold/timewarrior-indicator/releases).
-
-### Build from Source
-
+**Build from source:**
 ```bash
 cd macos
 ./build.sh
 cp -r build/TimeWarriorMenuBar.app /Applications/
 ```
 
-### Code Signing
+**Sign the app:** `./sign.sh "Developer ID Application: Your Name"`
 
-To sign the app after building (or after downloading from GitHub Actions):
+---
 
-```bash
-./sign.sh "Developer ID Application: Your Name (TEAM_ID)"
-```
-
-## License
-
-Copyright (C) 2025
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Copyright (C) 2025 - GNU General Public License v3
 
