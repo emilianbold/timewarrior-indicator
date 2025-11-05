@@ -33,16 +33,7 @@ has to be enabled with *gnome-extensions-app* and/or *gnome-tweak-tool*
 
 ### macOS (Menu Bar Application)
 
-See the [macOS README](macos/README.md) for detailed instructions.
-
-Quick start:
-```bash
-git clone https://github.com/emilianbold/timewarrior-indicator.git
-cd timewarrior-indicator/macos
-./build.sh
-cp -r build/TimeWarriorMenuBar.app /Applications/
-open /Applications/TimeWarriorMenuBar.app
-```
+See the [macOS README](macos/README.md).
 
 ## Author
 
