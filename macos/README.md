@@ -19,8 +19,16 @@ Download the latest release from the [Releases page](https://github.com/emilianb
 
 ```bash
 cd macos
-./build.sh --universal
+./build.sh
 cp -r build/TimeWarriorMenuBar.app /Applications/
+```
+
+### Code Signing
+
+To sign the app after building (or after downloading from GitHub Actions):
+
+```bash
+./sign.sh "Developer ID Application: Your Name (TEAM_ID)"
 ```
 
 ## License
