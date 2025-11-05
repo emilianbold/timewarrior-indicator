@@ -61,15 +61,6 @@ echo "Binary information:"
 file "${MACOS_DIR}/${APP_NAME}"
 
 echo ""
-echo "Build complete!"
-echo "Application bundle created at: ${APP_DIR}"
-echo ""
-echo "To sign the app:"
-echo "  ./sign.sh \"Developer ID Application: Your Name\""
-echo ""
-echo "To install:"
-echo "  cp -r ${APP_DIR} /Applications/"
-echo ""
-echo "To run:"
-echo "  open ${APP_DIR}"
+echo "✓ Build complete: ${APP_DIR}"
+
 
