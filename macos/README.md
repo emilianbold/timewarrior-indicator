@@ -145,25 +145,6 @@ cd macos
 
 The compiled app bundle will be in `build/TimeWarriorMenuBar.app`.
 
-### Package for Distribution
-
-To create ZIP and DMG distribution files:
-
-```bash
-cd macos
-
-# First build the app
-./build.sh --universal
-
-# Then package it
-./package-release.sh v1.0
-
-# Or use a custom version number
-./package-release.sh v1.2.3
-```
-
-Distribution files will be created in `build/dist/`.
-
 ### Automated Builds
 
 The project uses GitHub Actions to automatically build universal binaries (Intel + Apple Silicon) on every push to the main branch and for all tagged releases.
