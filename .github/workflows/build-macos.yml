@@ -33,14 +33,14 @@ jobs:
       - name: Build for x86_64 (Intel)
         run: |
           cd macos
-          swiftc -O -target x86_64-apple-macosx10.12 \
+          swiftc -O -target x86_64-apple-macosx12.0 \
             TimeWarriorMenuBar.swift \
             -o TimeWarriorMenuBar-x86_64
 
       - name: Build for arm64 (Apple Silicon)
         run: |
           cd macos
-          swiftc -O -target arm64-apple-macosx11.0 \
+          swiftc -O -target arm64-apple-macosx12.0 \
             TimeWarriorMenuBar.swift \
             -o TimeWarriorMenuBar-arm64
 

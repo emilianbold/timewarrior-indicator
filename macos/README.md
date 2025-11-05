@@ -13,7 +13,7 @@ A native macOS menu bar application that displays your current [timewarrior](htt
 
 ## Prerequisites
 
-- macOS 10.12 (Sierra) or later
+- macOS 12 (Monterey) or later
 - [Timewarrior](https://timewarrior.net/) installed
 - Swift compiler (comes with Xcode Command Line Tools) - only needed for building from source
 

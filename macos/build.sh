@@ -61,13 +61,13 @@ if [ "$BUILD_UNIVERSAL" = true ]; then
 
     # Build for Intel
     echo "  - Compiling for x86_64 (Intel)..."
-    swiftc -O -target x86_64-apple-macosx10.12 \
+    swiftc -O -target x86_64-apple-macosx12.0 \
         TimeWarriorMenuBar.swift \
         -o "${BUILD_DIR}/${APP_NAME}-x86_64"
 
     # Build for Apple Silicon
     echo "  - Compiling for arm64 (Apple Silicon)..."
-    swiftc -O -target arm64-apple-macosx11.0 \
+    swiftc -O -target arm64-apple-macosx12.0 \
         TimeWarriorMenuBar.swift \
         -o "${BUILD_DIR}/${APP_NAME}-arm64"
 
@@ -87,12 +87,8 @@ if [ "$BUILD_UNIVERSAL" = true ]; then
 elif [ -n "$TARGET_ARCH" ]; then
     echo "Building for architecture: $TARGET_ARCH..."
 
-    # Determine minimum macOS version based on architecture
-    if [ "$TARGET_ARCH" = "arm64" ]; then
-        MIN_OS="11.0"
-    else
-        MIN_OS="10.12"
-    fi
+    # Both architectures target macOS 12.0 (Monterey)
+    MIN_OS="12.0"
 
     swiftc -O -target "${TARGET_ARCH}-apple-macosx${MIN_OS}" \
         TimeWarriorMenuBar.swift \
