@@ -186,26 +186,17 @@ The project uses GitHub Actions to automatically build universal binaries (Intel
 
 ## Code Signing
 
-To distribute your app without Gatekeeper warnings, you should code sign it with your Apple Developer certificate.
-
-### Local Signing
+To distribute your app without Gatekeeper warnings, code sign it with your Apple Developer certificate:
 
 ```bash
 # Build and sign in one command
 ./build.sh --universal --sign "Developer ID Application: Your Name (TEAM_ID)"
 ```
 
-### GitHub Actions Signing
-
-Add these secrets to your repository (**Settings → Secrets and variables → Actions**):
-
+For GitHub Actions signing, add these secrets to your repository (**Settings → Secrets and variables → Actions**):
 - `MACOS_CERTIFICATE`: Base64-encoded .p12 certificate
 - `MACOS_CERTIFICATE_PWD`: Certificate password
-- `MACOS_SIGNING_IDENTITY`: Your developer identity (e.g., "Developer ID Application: Your Name")
-
-The workflow will automatically sign builds when these secrets are configured.
-
-**For complete code signing and notarization instructions, see [CODE_SIGNING.md](CODE_SIGNING.md)**
+- `MACOS_SIGNING_IDENTITY`: Your developer identity
 
 ## Troubleshooting
 
