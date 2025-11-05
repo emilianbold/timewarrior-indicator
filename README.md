@@ -1,6 +1,10 @@
-## Timewarrior indicator gnome-shell extensions
+## Timewarrior Indicator
 
-A very simple indicator for the gnome-shell that displays the current activity tracked from [timewarrior](https://timewarrior.net/)
+Simple indicators that display the current activity tracked from [timewarrior](https://timewarrior.net/)
+
+Available for:
+- **Linux**: GNOME Shell extension
+- **macOS**: Native menu bar application
 
 ## Prerequisites
 
@@ -14,6 +18,8 @@ The duration is also derived from the output of the __timew__ command and is dis
 
 ## Installation
 
+### Linux (GNOME Shell Extension)
+
 The extension can be installed directly from source,
 either for the convenience of using git or to test the latest version.
 
@@ -24,6 +30,19 @@ Clone the latest version with git
 
 A Shell reload is required <code>Alt+F2 r Enter</code> and extension
 has to be enabled with *gnome-extensions-app* and/or *gnome-tweak-tool*
+
+### macOS (Menu Bar Application)
+
+See the [macOS README](macos/README.md) for detailed instructions.
+
+Quick start:
+```bash
+git clone https://github.com/emilianbold/timewarrior-indicator.git
+cd timewarrior-indicator/macos
+./build.sh
+cp -r build/TimeWarriorMenuBar.app /Applications/
+open /Applications/TimeWarriorMenuBar.app
+```
 
 ## Author
 
