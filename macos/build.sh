@@ -3,9 +3,11 @@
 # Build script for TimeWarrior MenuBar app
 #
 # Usage:
-#   ./build.sh              - Build for current architecture
-#   ./build.sh --universal  - Build universal binary (x86_64 + arm64)
-#   ./build.sh --arch arm64 - Build for specific architecture
+#   ./build.sh                           - Build for current architecture
+#   ./build.sh --universal               - Build universal binary (x86_64 + arm64)
+#   ./build.sh --arch arm64              - Build for specific architecture
+#   ./build.sh --sign "Developer ID"     - Sign the application
+#   ./build.sh --universal --sign "..."  - Build universal and sign
 #
 
 set -e
@@ -20,6 +22,7 @@ RESOURCES_DIR="${CONTENTS_DIR}/Resources"
 # Parse command line arguments
 BUILD_UNIVERSAL=false
 TARGET_ARCH=""
+SIGN_IDENTITY=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -31,9 +34,13 @@ while [[ $# -gt 0 ]]; do
             TARGET_ARCH="$2"
             shift 2
             ;;
+        --sign)
+            SIGN_IDENTITY="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--universal] [--arch <architecture>]"
+            echo "Usage: $0 [--universal] [--arch <architecture>] [--sign <identity>]"
             exit 1
             ;;
     esac
@@ -54,7 +61,7 @@ if [ "$BUILD_UNIVERSAL" = true ]; then
 
     # Build for Intel
     echo "  - Compiling for x86_64 (Intel)..."
-    swiftc -O -target x86_64-apple-macosx10.13 \
+    swiftc -O -target x86_64-apple-macosx10.12 \
         TimeWarriorMenuBar.swift \
         -o "${BUILD_DIR}/${APP_NAME}-x86_64"
 
@@ -84,7 +91,7 @@ elif [ -n "$TARGET_ARCH" ]; then
     if [ "$TARGET_ARCH" = "arm64" ]; then
         MIN_OS="11.0"
     else
-        MIN_OS="10.13"
+        MIN_OS="10.12"
     fi
 
     swiftc -O -target "${TARGET_ARCH}-apple-macosx${MIN_OS}" \
@@ -101,10 +108,40 @@ cp Info.plist "${CONTENTS_DIR}/"
 # Make executable
 chmod +x "${MACOS_DIR}/${APP_NAME}"
 
+# Code signing
+if [ -n "$SIGN_IDENTITY" ]; then
+    echo ""
+    echo "Signing application with identity: ${SIGN_IDENTITY}"
+
+    # Sign the binary
+    codesign --force --options runtime --sign "${SIGN_IDENTITY}" \
+        --timestamp \
+        "${MACOS_DIR}/${APP_NAME}"
+
+    # Sign the app bundle
+    codesign --force --options runtime --sign "${SIGN_IDENTITY}" \
+        --timestamp \
+        "${APP_DIR}"
+
+    echo "  ✓ Application signed successfully"
+
+    # Verify signature
+    echo "  - Verifying signature..."
+    codesign --verify --verbose "${APP_DIR}"
+    echo "  ✓ Signature verified"
+fi
+
 # Show binary info
 echo ""
 echo "Binary information:"
 file "${MACOS_DIR}/${APP_NAME}"
+
+# Show code signature info
+if [ -n "$SIGN_IDENTITY" ]; then
+    echo ""
+    echo "Code signature:"
+    codesign -dvv "${APP_DIR}" 2>&1 | grep -E "(Authority|Identifier|TeamIdentifier)"
+fi
 
 echo ""
 echo "Build complete!"

@@ -13,9 +13,9 @@ A native macOS menu bar application that displays your current [timewarrior](htt
 
 ## Prerequisites
 
-- macOS 10.13 (High Sierra) or later
+- macOS 10.12 (Sierra) or later
 - [Timewarrior](https://timewarrior.net/) installed
-- Swift compiler (comes with Xcode Command Line Tools)
+- Swift compiler (comes with Xcode Command Line Tools) - only needed for building from source
 
 ### Installing Timewarrior
 
@@ -83,23 +83,22 @@ Download the latest universal binary (works on both Intel and Apple Silicon Macs
 
 ## Configuration
 
-Edit the `Config` struct in `TimeWarriorMenuBar.swift` to customize:
+The app automatically detects the `timew` binary location using `which timew`. If not found, it falls back to common locations:
+- `/usr/local/bin/timew` (Homebrew Intel)
+- `/opt/homebrew/bin/timew` (Homebrew Apple Silicon)
+- `/usr/bin/timew` (System)
+
+To customize other settings, edit the `Config` struct in `TimeWarriorMenuBar.swift`:
 
 ```swift
 struct Config {
-    static var timewPath = "/usr/local/bin/timew"  // Path to timew binary
     static var updateInterval: TimeInterval = 10.0  // Update interval in seconds
     static var tagLimit = 20                        // Max characters for tag display
     static var defaultTag = "Work"                  // Default tag when none exists
 }
 ```
 
-If you installed timewarrior via Homebrew, the path might be `/opt/homebrew/bin/timew` (Apple Silicon) or `/usr/local/bin/timew` (Intel).
-
-To find your timew path:
-```bash
-which timew
-```
+**Note**: The `timewPath` is now automatically detected and doesn't need manual configuration!
 
 ## Usage
 
@@ -172,6 +171,7 @@ The project uses GitHub Actions to automatically build universal binaries (Intel
 **CI/CD Features:**
 - Builds for both x86_64 (Intel) and arm64 (Apple Silicon)
 - Creates universal binary using `lipo`
+- Optional code signing (if configured)
 - Packages as both ZIP and DMG
 - Automatically creates GitHub releases for version tags
 
@@ -184,17 +184,45 @@ The project uses GitHub Actions to automatically build universal binaries (Intel
 - For tagged releases: Visit the [Releases page](https://github.com/emilianbold/timewarrior-indicator/releases)
 - For branch builds: Go to [Actions](https://github.com/emilianbold/timewarrior-indicator/actions) and download artifacts from recent workflow runs
 
+## Code Signing
+
+To distribute your app without Gatekeeper warnings, you should code sign it with your Apple Developer certificate.
+
+### Local Signing
+
+```bash
+# Build and sign in one command
+./build.sh --universal --sign "Developer ID Application: Your Name (TEAM_ID)"
+```
+
+### GitHub Actions Signing
+
+Add these secrets to your repository (**Settings → Secrets and variables → Actions**):
+
+- `MACOS_CERTIFICATE`: Base64-encoded .p12 certificate
+- `MACOS_CERTIFICATE_PWD`: Certificate password
+- `MACOS_SIGNING_IDENTITY`: Your developer identity (e.g., "Developer ID Application: Your Name")
+
+The workflow will automatically sign builds when these secrets are configured.
+
+**For complete code signing and notarization instructions, see [CODE_SIGNING.md](CODE_SIGNING.md)**
+
 ## Troubleshooting
 
 ### "Cannot find timew binary"
 
-Make sure timewarrior is installed and the path in the Config is correct:
+The app automatically detects `timew` using `which`. Make sure timewarrior is installed:
 
 ```bash
 which timew
 ```
 
-Update `Config.timewPath` in `TimeWarriorMenuBar.swift` with the correct path.
+If `timew` is not in your PATH, create a symlink to a standard location:
+
+```bash
+# Example for custom installation
+sudo ln -s /path/to/your/timew /usr/local/bin/timew
+```
 
 ### Menu bar doesn't update
 
@@ -207,6 +235,19 @@ timew
 ### Permission issues
 
 The app needs permission to execute external commands. If you get permission errors, check System Preferences → Security & Privacy → Privacy → Automation.
+
+### "App is damaged and can't be opened"
+
+This happens when downloading from the internet and the app isn't signed/notarized.
+
+**Solution 1**: Right-click the app and select "Open" (first time only)
+
+**Solution 2**: Remove quarantine attribute:
+```bash
+xattr -cr /Applications/TimeWarriorMenuBar.app
+```
+
+**Solution 3**: Build from source or use a signed release
 
 ## Development
 

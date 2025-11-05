@@ -16,7 +16,47 @@ import Foundation
 
 // MARK: - Configuration
 struct Config {
-    static var timewPath = "/usr/local/bin/timew"
+    static var timewPath: String = {
+        // Try to find timew using 'which'
+        let task = Process()
+        task.launchPath = "/usr/bin/which"
+        task.arguments = ["timew"]
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = Pipe()
+
+        do {
+            try task.run()
+            task.waitUntilExit()
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let path = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !path.isEmpty,
+               task.terminationStatus == 0 {
+                return path
+            }
+        } catch {
+            print("Error finding timew with 'which': \(error)")
+        }
+
+        // Fallback to common locations
+        let fallbackPaths = [
+            "/usr/local/bin/timew",
+            "/opt/homebrew/bin/timew",
+            "/usr/bin/timew"
+        ]
+
+        for path in fallbackPaths {
+            if FileManager.default.fileExists(atPath: path) {
+                return path
+            }
+        }
+
+        // Last resort fallback
+        return "/usr/local/bin/timew"
+    }()
+
     static var updateInterval: TimeInterval = 10.0
     static var tagLimit = 20
     static var defaultTag = "Work"
