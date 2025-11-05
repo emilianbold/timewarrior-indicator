@@ -13,13 +13,13 @@
 import Cocoa
 import Foundation
 
-// MARK: - Configuration
-struct Config {
-    static var timewPath: String = {
-        // Try to find timew using 'which'
+// MARK: - Utilities
+extension Process {
+    /// Execute a command and return stdout as a string, or nil on failure
+    static func execute(_ launchPath: String, arguments: [String] = []) -> String? {
         let task = Process()
-        task.launchPath = "/usr/bin/which"
-        task.arguments = ["timew"]
+        task.launchPath = launchPath
+        task.arguments = arguments
 
         let pipe = Pipe()
         task.standardOutput = pipe
@@ -29,14 +29,50 @@ struct Config {
             try task.run()
             task.waitUntilExit()
 
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let path = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
-               !path.isEmpty,
-               task.terminationStatus == 0 {
-                return path
+            guard task.terminationStatus == 0 else {
+                return nil
             }
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
         } catch {
-            print("Error finding timew with 'which': \(error)")
+            print("Error executing \(launchPath): \(error)")
+            return nil
+        }
+    }
+
+    /// Execute a command and return raw data, or nil on failure
+    static func executeData(_ launchPath: String, arguments: [String] = []) -> Data? {
+        let task = Process()
+        task.launchPath = launchPath
+        task.arguments = arguments
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = Pipe()
+
+        do {
+            try task.run()
+            task.waitUntilExit()
+
+            guard task.terminationStatus == 0 else {
+                return nil
+            }
+
+            return pipe.fileHandleForReading.readDataToEndOfFile()
+        } catch {
+            print("Error executing \(launchPath): \(error)")
+            return nil
+        }
+    }
+}
+
+// MARK: - Configuration
+struct Config {
+    static var timewPath: String = {
+        // Try to find timew using 'which'
+        if let path = Process.execute("/usr/bin/which", arguments: ["timew"]), !path.isEmpty {
+            return path
         }
 
         // Fallback to common locations
@@ -74,27 +110,10 @@ class TimeWarriorManager {
 
     // Check if timewarrior is currently tracking
     func isActive() -> Bool {
-        let task = Process()
-        task.launchPath = Config.timewPath
-        task.arguments = ["get", "dom.active"]
-
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = Pipe()
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
-                return output == "1"
-            }
-        } catch {
-            print("Error checking timewarrior status: \(error)")
+        guard let output = Process.execute(Config.timewPath, arguments: ["get", "dom.active"]) else {
+            return false
         }
-
-        return false
+        return output == "1"
     }
 
     // Fetch current activity details
@@ -104,43 +123,26 @@ class TimeWarriorManager {
         }
 
         // Get JSON data
-        let task = Process()
-        task.launchPath = Config.timewPath
-        task.arguments = ["get", "dom.active.json"]
-
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = Pipe()
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-
-            guard let activity = try? JSONDecoder().decode(TimeWarriorActivity.self, from: data) else {
-                return nil
-            }
-
-            // Get tags (use longest one)
-            let tags = activity.tags?.sorted(by: { $0.count > $1.count }) ?? [Config.defaultTag]
-            var displayTag = tags.first ?? Config.defaultTag
-
-            if displayTag.count > Config.tagLimit {
-                displayTag = String(displayTag.prefix(Config.tagLimit)) + "..."
-            }
-
-            // Calculate duration
-            let duration = calculateDuration(from: activity.start)
-
-            // Get daily total
-            let totalTime = getDailyTotal()
-
-            return "\(displayTag) \(duration) ⌛ \(totalTime)"
-        } catch {
-            print("Error fetching activity: \(error)")
+        guard let data = Process.executeData(Config.timewPath, arguments: ["get", "dom.active.json"]),
+              let activity = try? JSONDecoder().decode(TimeWarriorActivity.self, from: data) else {
             return nil
         }
+
+        // Get tags (use longest one)
+        let tags = activity.tags?.sorted(by: { $0.count > $1.count }) ?? [Config.defaultTag]
+        var displayTag = tags.first ?? Config.defaultTag
+
+        if displayTag.count > Config.tagLimit {
+            displayTag = String(displayTag.prefix(Config.tagLimit)) + "..."
+        }
+
+        // Calculate duration
+        let duration = calculateDuration(from: activity.start)
+
+        // Get daily total
+        let totalTime = getDailyTotal()
+
+        return "\(displayTag) \(duration) ⌛ \(totalTime)"
     }
 
     // Calculate duration from start time
@@ -165,28 +167,13 @@ class TimeWarriorManager {
 
     // Get daily total time
     private func getDailyTotal() -> String {
-        let task = Process()
-        task.launchPath = Config.timewPath
-        task.arguments = ["summary"]
+        guard let output = Process.execute(Config.timewPath, arguments: ["summary"]) else {
+            return "0:00:00"
+        }
 
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = Pipe()
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let output = String(data: data, encoding: .utf8) {
-                let lines = output.components(separatedBy: .newlines)
-                if lines.count >= 3 {
-                    let totalLine = lines[lines.count - 3].trimmingCharacters(in: .whitespaces)
-                    return totalLine
-                }
-            }
-        } catch {
-            print("Error getting daily total: \(error)")
+        let lines = output.components(separatedBy: .newlines)
+        if lines.count >= 3 {
+            return lines[lines.count - 3].trimmingCharacters(in: .whitespaces)
         }
 
         return "0:00:00"
@@ -194,25 +181,12 @@ class TimeWarriorManager {
 
     // Stop tracking
     func stopTracking() {
-        executeCommand(arguments: ["stop"])
+        _ = Process.execute(Config.timewPath, arguments: ["stop"])
     }
 
     // Continue/restart tracking
     func continueTracking() {
-        executeCommand(arguments: ["continue"])
-    }
-
-    private func executeCommand(arguments: [String]) {
-        let task = Process()
-        task.launchPath = Config.timewPath
-        task.arguments = arguments
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-        } catch {
-            print("Error executing command: \(error)")
-        }
+        _ = Process.execute(Config.timewPath, arguments: ["continue"])
     }
 }
 
