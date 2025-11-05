@@ -1,10 +1,9 @@
 #!/usr/bin/swift
 //
 // TimeWarrior MenuBar Indicator for macOS
-// A menu bar application that displays the current timewarrior activity
+// A native menu bar application that displays the current timewarrior activity
 //
-// Based on the GNOME Shell extension by Tassos Natsakis
-// macOS port - Copyright (C) 2025
+// Copyright (C) 2025
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software

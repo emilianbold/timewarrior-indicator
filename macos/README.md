@@ -262,8 +262,6 @@ The application is written in Swift and uses:
 
 Copyright (C) 2025
 
-Based on the GNOME Shell extension by Tassos Natsakis (2017)
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 See the LICENSE file for details.
@@ -274,6 +272,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## Credits
 
-- Original GNOME Shell extension: [Tassos Natsakis](https://github.com/tassos/timewarrior-indicator)
-- macOS port: 2025
 - [Timewarrior](https://timewarrior.net/) by GothenburgBitFactory
