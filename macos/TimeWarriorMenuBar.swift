@@ -15,34 +15,8 @@ import Foundation
 
 // MARK: - Utilities
 extension Process {
-    /// Execute a command and return stdout as a string, or nil on failure
-    static func execute(_ launchPath: String, arguments: [String] = []) -> String? {
-        let task = Process()
-        task.launchPath = launchPath
-        task.arguments = arguments
-
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = Pipe()
-
-        do {
-            try task.run()
-            task.waitUntilExit()
-
-            guard task.terminationStatus == 0 else {
-                return nil
-            }
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            return String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        } catch {
-            print("Error executing \(launchPath): \(error)")
-            return nil
-        }
-    }
-
-    /// Execute a command and return raw data, or nil on failure
-    static func executeData(_ launchPath: String, arguments: [String] = []) -> Data? {
+    /// Execute a command and return stdout as Data, or nil on failure
+    static func execute(_ launchPath: String, arguments: [String] = []) -> Data? {
         let task = Process()
         task.launchPath = launchPath
         task.arguments = arguments
@@ -67,11 +41,19 @@ extension Process {
     }
 }
 
+extension Data {
+    /// Convert Data to trimmed String
+    var asString: String? {
+        String(data: self, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 // MARK: - Configuration
 struct Config {
     static var timewPath: String = {
         // Try to find timew using 'which'
-        if let path = Process.execute("/usr/bin/which", arguments: ["timew"]), !path.isEmpty {
+        if let data = Process.execute("/usr/bin/which", arguments: ["timew"]),
+           let path = data.asString, !path.isEmpty {
             return path
         }
 
@@ -110,7 +92,8 @@ class TimeWarriorManager {
 
     // Check if timewarrior is currently tracking
     func isActive() -> Bool {
-        guard let output = Process.execute(Config.timewPath, arguments: ["get", "dom.active"]) else {
+        guard let data = Process.execute(Config.timewPath, arguments: ["get", "dom.active"]),
+              let output = data.asString else {
             return false
         }
         return output == "1"
@@ -123,7 +106,7 @@ class TimeWarriorManager {
         }
 
         // Get JSON data
-        guard let data = Process.executeData(Config.timewPath, arguments: ["get", "dom.active.json"]),
+        guard let data = Process.execute(Config.timewPath, arguments: ["get", "dom.active.json"]),
               let activity = try? JSONDecoder().decode(TimeWarriorActivity.self, from: data) else {
             return nil
         }
@@ -167,7 +150,8 @@ class TimeWarriorManager {
 
     // Get daily total time
     private func getDailyTotal() -> String {
-        guard let output = Process.execute(Config.timewPath, arguments: ["summary"]) else {
+        guard let data = Process.execute(Config.timewPath, arguments: ["summary"]),
+              let output = data.asString else {
             return "0:00:00"
         }
 
